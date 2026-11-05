@@ -1,0 +1,6 @@
+{
+  "name": "VEX",
+  "description": "VEX Hero Section with raw video background and liquid glass components",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
