@@ -34,17 +34,19 @@ import {
   Phone,
   Mail,
   Clock,
-  Calendar
+  Calendar,
+  ShieldCheck
 } from 'lucide-react';
 import { LithosSpotlightHero } from './LithosSpotlightHero';
 import { JainLogo } from './JainLogo';
 import { LiveCampusWidget } from './LiveCampusWidget';
 
 interface StoryViewProps {
-  onBackToHome: () => void;
+  onBackToHome?: () => void;
   onOpenOrientation: () => void;
   onOpenHostel?: () => void;
   onOpenTimetable?: () => void;
+  onOpenAdmin?: () => void;
 }
 
 interface RecruiterPartner {
@@ -309,7 +311,8 @@ export const StoryView: React.FC<StoryViewProps> = ({
   onBackToHome, 
   onOpenOrientation,
   onOpenHostel,
-  onOpenTimetable
+  onOpenTimetable,
+  onOpenAdmin
 }) => {
   const [viewMode, setViewMode] = useState<'lithos' | 'campus'>('campus');
   const [activeSection, setActiveSection] = useState<'overview' | 'academics' | 'facilities' | 'hostels' | 'gallery' | 'placements' | 'life'>('overview');
@@ -484,9 +487,12 @@ export const StoryView: React.FC<StoryViewProps> = ({
     <div className="w-full min-h-screen bg-black text-white relative animate-fadeIn selection:bg-white selection:text-black">
       {/* 1. Top Spotlight Hero Section */}
       <LithosSpotlightHero
-        onBackToHome={onBackToHome}
+        onBackToHome={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         onSwitchToCampusStory={scrollToDetails}
         onOpenOrientation={onOpenOrientation}
+        onOpenAdmin={onOpenAdmin}
+        onOpenTimetable={onOpenTimetable}
+        onOpenHostel={onOpenHostel}
       />
 
       {/* 2. Seamless Campus Story Details Section */}
@@ -495,51 +501,75 @@ export const StoryView: React.FC<StoryViewProps> = ({
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-64 bg-radial from-amber-500/10 via-white/5 to-transparent blur-3xl pointer-events-none -z-10" />
 
         {/* Sticky Secondary Navigation Header for Campus Sections */}
-        <header className="sticky top-0 z-40 px-6 md:px-12 py-3.5 flex items-center justify-between bg-black/90 border-b border-white/15 backdrop-blur-xl shadow-2xl">
-          <div className="flex items-center gap-4">
+        <header className="sticky top-0 z-40 px-3 sm:px-6 md:px-12 py-2.5 sm:py-3.5 flex items-center justify-between bg-black/95 border-b border-white/15 backdrop-blur-xl shadow-2xl">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <button
               type="button"
-              onClick={onBackToHome}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="text-left select-none hover:opacity-90 transition-opacity cursor-pointer bg-transparent border-0 p-0"
             >
               <JainLogo size="sm" />
             </button>
             <button
               type="button"
-              onClick={onBackToHome}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-gray-200 transition-all cursor-pointer border border-white/10"
             >
-              ← Back to Home
+              ↑ Campus Top
             </button>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {onOpenHostel && (
+              <button
+                type="button"
+                onClick={onOpenHostel}
+                className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-gray-200 transition-all cursor-pointer border border-white/10"
+              >
+                <Bed className="w-3.5 h-3.5 text-amber-400" />
+                <span>Hostel</span>
+              </button>
+            )}
             {onOpenTimetable && (
               <button
                 type="button"
                 onClick={onOpenTimetable}
-                className="bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5 font-grotesk tracking-wide"
+                className="bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40 px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all shadow-md cursor-pointer flex items-center gap-1.5 font-grotesk tracking-wide active:scale-95 shrink-0"
               >
                 <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                <span>All Timetables</span>
+                <span className="hidden sm:inline">All Timetables</span>
+                <span className="sm:hidden">TT</span>
+              </button>
+            )}
+            {onOpenAdmin && (
+              <button
+                type="button"
+                onClick={onOpenAdmin}
+                className="bg-amber-400/10 border border-amber-400/40 text-amber-300 hover:bg-amber-400/20 px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm font-grotesk active:scale-95 shrink-0"
+                title="Admin Access Backend Portal"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span className="hidden sm:inline">Admin Access</span>
+                <span className="sm:hidden">Admin</span>
               </button>
             )}
             <button
               type="button"
               onClick={onOpenOrientation}
-              className="bg-white text-black hover:bg-gray-100 px-4 py-1.5 rounded-full text-xs font-extrabold transition-all shadow-md hover:scale-[1.02] active:scale-98 cursor-pointer font-grotesk uppercase tracking-wider"
+              className="bg-white text-black hover:bg-gray-100 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-extrabold transition-all shadow-md hover:scale-[1.02] active:scale-95 cursor-pointer font-grotesk uppercase tracking-wider shrink-0"
             >
-              Orientation Prog
+              <span className="hidden sm:inline">Orientation Prog</span>
+              <span className="sm:hidden">Orientation</span>
             </button>
           </div>
         </header>
 
         {/* Live Real-Time Campus Weather, IST Clock & Ambient Soundscape Widget */}
-        <div className="mb-8 rounded-3xl overflow-hidden border border-white/20 shadow-2xl">
+        <div className="mb-6 sm:mb-8 rounded-2xl sm:rounded-3xl overflow-hidden border border-white/20 shadow-2xl">
           <LiveCampusWidget />
         </div>
 
-        <div className="px-6 md:px-12 lg:px-16 pt-2 max-w-7xl mx-auto">
+        <div className="px-4 sm:px-6 md:px-12 lg:px-16 pt-2 max-w-7xl mx-auto">
           {/* Editorial Header Banner */}
           <motion.div
             initial={{ opacity: 0, y: 35 }}
@@ -616,13 +646,13 @@ export const StoryView: React.FC<StoryViewProps> = ({
         </motion.div>
       </motion.div>
 
-      {/* Sub Navigation Bar */}
+      {/* Sub Navigation Bar with Mobile Horizontal Swipe Support */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="flex flex-wrap items-center gap-2 mb-10 border-b border-white/15 pb-4"
+        className="flex items-center gap-2 mb-8 border-b border-white/15 pb-3 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 flex-nowrap sm:flex-wrap"
       >
         {[
           { id: 'overview', label: 'Overview & Ethos', icon: Compass },
@@ -639,13 +669,13 @@ export const StoryView: React.FC<StoryViewProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveSection(tab.id as any)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all cursor-pointer font-grotesk tracking-wide ${
+              className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer font-grotesk tracking-wide shrink-0 active:scale-95 whitespace-nowrap ${
                 isActive
                   ? 'bg-white text-black font-extrabold shadow-lg scale-[1.02]'
                   : 'liquid-glass text-gray-300 hover:text-white hover:bg-white/10 border border-white/10'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>{tab.label}</span>
             </button>
           );
@@ -745,13 +775,14 @@ export const StoryView: React.FC<StoryViewProps> = ({
                   <span>Open Location in Google Maps</span>
                 </a>
                 <a
-                  href="https://maps.google.com/?q=12.6858,77.4939&t=k&z=17"
+                  href="https://jainsmartnavigation.ai.studio/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-amber-400/10 text-amber-300 hover:bg-amber-400/20 px-5 py-2.5 rounded-xl text-xs font-bold transition-all border border-amber-400/30 font-grotesk tracking-wider uppercase cursor-pointer"
+                  className="inline-flex items-center gap-2 bg-amber-400 text-black hover:bg-amber-300 px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-amber-300 font-grotesk tracking-wider uppercase shadow-lg hover:scale-[1.02] active:scale-98 cursor-pointer"
                 >
-                  <Globe2 className="w-4 h-4 text-amber-400" />
-                  <span>Direct Satellite View</span>
+                  <Compass className="w-4 h-4 text-black stroke-[2.5]" />
+                  <span>JAIN Smart Navigation App</span>
+                  <ArrowUpRight className="w-4 h-4 text-black stroke-[2.5]" />
                 </a>
               </div>
             </motion.div>
@@ -777,10 +808,13 @@ export const StoryView: React.FC<StoryViewProps> = ({
                 </button>
                 <button
                   type="button"
-                  onClick={onBackToHome}
+                  onClick={() => {
+                    if (onOpenTimetable) onOpenTimetable();
+                    else window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="w-full liquid-glass text-white py-3.5 px-5 rounded-xl font-extrabold text-xs uppercase tracking-wider font-grotesk hover:bg-white/10 transition-all flex items-center justify-between border border-white/20 cursor-pointer"
                 >
-                  <span>Back to Video Hero</span>
+                  <span>All Classes Timetables Matrix</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -814,70 +848,147 @@ export const StoryView: React.FC<StoryViewProps> = ({
               </ul>
             </motion.div>
 
-            {/* Live Campus Satellite View Card */}
+            {/* JAIN Smart Navigation Official Collaboration Card */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="liquid-glass rounded-3xl p-6 md:p-8 border border-white/15 overflow-hidden space-y-4 shadow-2xl relative"
+              className="liquid-glass rounded-3xl p-6 md:p-8 border border-amber-400/40 overflow-hidden space-y-4 shadow-2xl relative bg-gradient-to-b from-amber-500/10 via-zinc-950/80 to-black"
             >
               <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2.5">
-                  <Globe2 className="w-5 h-5 text-amber-400" />
-                  <h3 className="text-lg md:text-xl font-playfair italic font-bold text-white">
-                    Campus Satellite View
-                  </h3>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-400/20 border border-amber-400/50 flex items-center justify-center text-amber-400 shadow-md">
+                    <Compass className="w-5 h-5 stroke-[2.5]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg md:text-xl font-playfair italic font-bold text-white flex items-center gap-2">
+                      JAIN Smart Navigation
+                    </h3>
+                    <p className="text-[11px] text-amber-300 font-medium">Official Campus Interactive Navigation Collab</p>
+                  </div>
                 </div>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider text-emerald-300 font-grotesk">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  Live Satellite
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-400/20 border border-amber-400/50 text-[10px] font-bold uppercase tracking-wider text-amber-300 font-grotesk">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  Live Collab
                 </span>
               </div>
 
               <p className="text-xs text-gray-300 leading-relaxed">
-                300+ Acre JAIN Global Campus Aerial Imagery (NH-209 Kanakapura Road, Bengaluru).
+                In collaboration with <strong className="text-white">JAIN Smart Navigation</strong>, students, faculty, and visitors can now navigate our 300+ acre global campus with real-time turn-by-turn routing, 3D block maps, floor plans, and lab directories.
               </p>
 
-              {/* Interactive Satellite Embed Container */}
-              <div className="relative w-full h-64 md:h-72 rounded-2xl overflow-hidden border border-white/20 bg-black group shadow-inner">
-                <iframe
-                  title="JAIN SET Campus Satellite Map"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0, filter: 'contrast(1.08) brightness(0.95)' }}
-                  loading="lazy"
-                  allowFullScreen
-                  src="https://maps.google.com/maps?q=Jain+Deemed-to-be+University+Faculty+of+Engineering+and+Technology+Kanakapura+Road+Bengaluru&t=k&z=16&ie=UTF8&iwloc=&output=embed"
-                  className="w-full h-full object-cover"
-                />
-
-                {/* Satellite Lens Overlay Details */}
-                <div className="absolute top-2.5 left-2.5 z-10 bg-black/80 backdrop-blur-md px-3 py-1 rounded-lg border border-white/20 text-[10px] font-mono text-amber-300 flex items-center gap-1.5 shadow-md">
-                  <Compass className="w-3 h-3 text-amber-400" />
-                  <span>12.6858° N, 77.4939° E</span>
+              {/* Interactive Glimpse & Navigation Preview Container */}
+              <div className="relative w-full rounded-2xl overflow-hidden border border-white/20 bg-gradient-to-b from-zinc-900 via-black to-zinc-950 shadow-xl group">
+                {/* Glimpse Header Bar */}
+                <div className="bg-black/90 px-3.5 py-2 border-b border-white/10 flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                    </div>
+                    <span className="text-[11px] font-mono text-gray-300">jainsmartnavigation.ai.studio</span>
+                  </div>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md font-mono font-semibold">
+                    GPS Active • 3D Campus
+                  </span>
                 </div>
 
-                <div className="absolute bottom-2.5 right-2.5 z-10 bg-black/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-[10px] font-extrabold text-white flex items-center gap-1.5 shadow-lg">
-                  <Layers className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Kanakapura Global Campus</span>
+                {/* Visual Glimpse of the Navigation App Interface */}
+                <div className="p-4 space-y-3">
+                  {/* Waypoint Routing Card Simulation */}
+                  <div className="bg-white/5 rounded-xl p-3 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-gray-400 font-mono">FROM:</span>
+                      <span className="text-white font-semibold flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                        Main Entrance Gate 1 (Kanakapura Rd)
+                      </span>
+                    </div>
+                    <div className="w-full flex items-center gap-2 py-0.5">
+                      <div className="h-px bg-white/10 flex-1" />
+                      <div className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 font-mono">
+                        380m • 4.5 min walk
+                      </div>
+                      <div className="h-px bg-white/10 flex-1" />
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-gray-400 font-mono">DESTINATION:</span>
+                      <span className="text-amber-300 font-semibold flex items-center gap-1.5">
+                        <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                        Engineering Block • Room 111 (AIML)
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Route Stats & Features Grid */}
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="p-2 rounded-lg bg-black/60 border border-white/10">
+                      <div className="text-[10px] text-gray-400 font-grotesk">Live Distance</div>
+                      <div className="text-xs font-bold text-white font-grotesk">380 meters</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-black/60 border border-white/10">
+                      <div className="text-[10px] text-gray-400 font-grotesk">Walking Time</div>
+                      <div className="text-xs font-bold text-emerald-400 font-grotesk">4.5 mins</div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-black/60 border border-white/10">
+                      <div className="text-[10px] text-gray-400 font-grotesk">Path Type</div>
+                      <div className="text-xs font-bold text-amber-300 font-grotesk">Canopy Walkway</div>
+                    </div>
+                  </div>
+
+                  {/* Feature Highlights Badges */}
+                  <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-gray-300 pt-1">
+                    <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      Indoor Floor-by-Floor Maps
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-1">
+                      <Layers className="w-3 h-3 text-cyan-400" />
+                      Accessible Paths
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 flex items-center gap-1">
+                      <Compass className="w-3 h-3 text-emerald-400" />
+                      Hostel & Mess Routes
+                    </span>
+                  </div>
+                </div>
+
+                {/* Direct Launch Banner */}
+                <div className="p-3 bg-black/90 border-t border-white/10 flex items-center justify-between gap-3">
+                  <div className="text-[11px] text-gray-300 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Live navigation active</span>
+                  </div>
+
+                  <a
+                    href="https://jainsmartnavigation.ai.studio/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-xs transition-all shadow-lg hover:scale-[1.02] active:scale-98 cursor-pointer"
+                  >
+                    <span>Launch Navigation App</span>
+                    <ArrowUpRight className="w-4 h-4 text-black stroke-[2.5]" />
+                  </a>
                 </div>
               </div>
 
+              {/* External Link Redirect Details */}
               <div className="flex items-center justify-between gap-3 pt-1">
                 <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-grotesk">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Interactive High-Res Imagery</span>
+                  <Globe2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>jainsmartnavigation.ai.studio</span>
                 </div>
 
                 <a
-                  href="https://maps.google.com/?q=12.6858,77.4939&t=k&z=17"
+                  href="https://jainsmartnavigation.ai.studio/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-300 hover:text-amber-200 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-300 hover:text-amber-200 transition-colors"
                 >
-                  <span>Full Satellite</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
+                  <span>Open Full Screen Navigation</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
             </motion.div>

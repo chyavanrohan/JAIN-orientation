@@ -487,6 +487,10 @@ export const TimetablePortalModal: React.FC<TimetablePortalModalProps> = ({
 
                   {/* Weekly Interactive Timetable Grid */}
                   <div className="overflow-x-auto rounded-2xl border border-white/15 bg-black/60 shadow-inner">
+                    <div className="sm:hidden px-3 py-1.5 text-[10px] text-gray-400 font-mono bg-white/5 border-b border-white/10 flex items-center justify-between">
+                      <span>← Swipe horizontally for Periods 1–7 →</span>
+                      <span className="text-amber-400 font-bold">Sem {currentBatch.semester}-{currentBatch.section}</span>
+                    </div>
                     <table className="w-full text-left border-collapse text-xs min-w-[760px]">
                       <thead>
                         <tr className="bg-white/10 border-b border-white/15 text-gray-300 font-mono text-[11px]">

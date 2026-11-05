@@ -9,21 +9,21 @@ export const JainLogo: React.FC<JainLogoProps> = ({ className = '', size = 'md' 
   const isLg = size === 'lg' || size === 'xl';
   const isSm = size === 'sm';
 
-  let emblemSize = 'w-10 h-10 md:w-11 md:h-11';
-  let titleSize = 'text-2xl md:text-3xl';
-  let barSize = 'h-[2.5px] w-4 md:w-5';
-  let subSize = 'text-[8.5px] md:text-[10px]';
+  let emblemSize = 'w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11';
+  let titleSize = 'text-xl sm:text-2xl md:text-3xl';
+  let barSize = 'h-[2px] sm:h-[2.5px] w-3.5 sm:w-4 md:w-5';
+  let subSize = 'text-[7.5px] sm:text-[8.5px] md:text-[10px]';
 
   if (isLg) {
-    emblemSize = size === 'xl' ? 'w-16 h-16 md:w-20 md:h-20' : 'w-12 h-12 md:w-16 md:h-16';
-    titleSize = size === 'xl' ? 'text-4xl md:text-6xl lg:text-7xl' : 'text-3xl md:text-5xl';
-    barSize = 'h-[3px] md:h-[4px] w-6 md:w-8';
-    subSize = size === 'xl' ? 'text-xs md:text-sm lg:text-base' : 'text-xs md:text-sm';
+    emblemSize = size === 'xl' ? 'w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20' : 'w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16';
+    titleSize = size === 'xl' ? 'text-3xl sm:text-4xl md:text-6xl lg:text-7xl' : 'text-2xl sm:text-3xl md:text-5xl';
+    barSize = 'h-[2.5px] sm:h-[3px] md:h-[4px] w-5 sm:w-6 md:w-8';
+    subSize = size === 'xl' ? 'text-[10px] sm:text-xs md:text-sm lg:text-base' : 'text-[9px] sm:text-xs md:text-sm';
   } else if (isSm) {
-    emblemSize = 'w-8 h-8';
-    titleSize = 'text-xl';
+    emblemSize = 'w-7 h-7 sm:w-8 sm:h-8';
+    titleSize = 'text-lg sm:text-xl';
     barSize = 'h-[2px] w-3';
-    subSize = 'text-[7.5px]';
+    subSize = 'text-[7px] sm:text-[7.5px]';
   }
 
   return (

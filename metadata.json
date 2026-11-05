@@ -1,6 +1,6 @@
 {
-  "name": "VEX",
-  "description": "VEX Hero Section with raw video background and liquid glass components",
+  "name": "JAIN (Deemed-to-be University) — JU-FET Campus Portal",
+  "description": "Faculty of Engineering & Technology (JU-FET) Official Campus Experience, Timetable Matrix, Hostel Accommodation, and Smart Navigation Portal.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

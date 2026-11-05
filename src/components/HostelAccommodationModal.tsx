@@ -106,8 +106,8 @@ export const HostelAccommodationModal: React.FC<HostelAccommodationModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/85 backdrop-blur-xl animate-fadeIn">
-      <div className="relative w-full max-w-5xl bg-zinc-950 border border-white/20 rounded-3xl p-5 md:p-8 text-white shadow-2xl max-h-[92vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-2.5 sm:p-5 md:p-6 bg-black/85 backdrop-blur-xl animate-fadeIn">
+      <div className="relative w-full max-w-5xl bg-zinc-950 border border-white/20 rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-8 text-white shadow-2xl max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden">
         
         {/* Header Bar */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10 shrink-0">

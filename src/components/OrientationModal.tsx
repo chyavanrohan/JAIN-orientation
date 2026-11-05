@@ -97,14 +97,14 @@ export const OrientationModal: React.FC<OrientationModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-4xl bg-zinc-950 border border-white/20 rounded-3xl p-6 md:p-8 text-white shadow-2xl max-h-[92vh] overflow-y-auto flex flex-col"
+        className="relative w-full max-w-4xl bg-zinc-950 border border-white/20 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-white shadow-2xl max-h-[94vh] sm:max-h-[92vh] overflow-y-auto flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer z-20"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer z-20 active:scale-95"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
@@ -112,25 +112,26 @@ export const OrientationModal: React.FC<OrientationModalProps> = ({
 
         {/* Modal Header Badge */}
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4 shrink-0 pr-8">
-          <div className="flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-white/10 text-white border border-white/10 w-fit">
+          <div className="flex items-center gap-2 text-xs font-semibold px-2.5 sm:px-3 py-1 rounded-full bg-white/10 text-white border border-white/10 w-fit">
             <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
             <span>School of Engineering & Technology (FET)</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <a
               href="https://jain-fet-hub.vercel.app/timeline#2026-April"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 hover:text-white transition-colors"
             >
-              <span>Source: jain-fet-hub.vercel.app/timeline</span>
+              <span className="hidden sm:inline">Source: jain-fet-hub.vercel.app</span>
+              <span className="sm:hidden">FET Hub</span>
               <ExternalLink className="w-3 h-3 text-amber-400" />
             </a>
 
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold font-mono">
+            <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>{cohort === 'Freshers' ? 'Freshers: 14 Seats' : 'Lateral Entry: 8 Seats'}</span>
+              <span>{cohort === 'Freshers' ? 'Freshers: 14 Seats' : 'Lateral: 8 Seats'}</span>
             </div>
           </div>
         </div>

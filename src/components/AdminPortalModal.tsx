@@ -512,8 +512,12 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({ isOpen, onCl
             )}
 
             {/* Registered Student Records Table */}
-            <div className="flex-1 overflow-y-auto border border-white/15 rounded-2xl bg-black/60 shadow-inner">
-              <table className="w-full text-left text-xs border-collapse">
+            <div className="flex-1 overflow-y-auto overflow-x-auto border border-white/15 rounded-2xl bg-black/60 shadow-inner">
+              <div className="sm:hidden px-3 py-1.5 text-[10px] text-gray-400 font-mono bg-white/5 border-b border-white/10 flex items-center justify-between">
+                <span>← Swipe table horizontally for actions →</span>
+                <span className="text-amber-400 font-bold">{filteredStudents.length} Students</span>
+              </div>
+              <table className="w-full text-left text-xs border-collapse min-w-[780px]">
                 <thead className="sticky top-0 bg-zinc-900 border-b border-white/15 text-gray-400 uppercase text-[10px] font-mono tracking-wider z-10">
                   <tr>
                     <th className="py-3 px-4">Reg ID</th>
