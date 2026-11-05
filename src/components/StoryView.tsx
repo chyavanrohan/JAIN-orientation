@@ -1612,10 +1612,10 @@ export const StoryView: React.FC<StoryViewProps> = ({
               >
                 <h3 className="text-lg font-bold text-white mb-2">Cultural & Sports Festivals</h3>
                 <p className="text-xs md:text-sm text-gray-300 leading-relaxed mb-4">
-                  Annual flagship events including "FETE" bringing together inter-college talent in music, drama, robotics, esports, and athletics on the 300+ acre campus.
+                  Annual flagship events including "Infinity" bringing together inter-college talent in music, fashion, robotics, drone design, and athletics on the 300+ acre campus.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {['FETE Cultural Fest', 'Olympic Sports Arena', 'Hack-a-Thon 24', 'TechSymposium'].map((fest, idx) => (
+                  {['Infinity Mega Fest', 'Sportastica Olympic Arena', 'Karunada Nityotsava', 'TechSymposium'].map((fest, idx) => (
                     <span key={idx} className="px-3 py-1 rounded-lg bg-white/10 text-xs font-grotesk font-bold text-white border border-white/15">
                       ✓ {fest}
                     </span>
@@ -1623,6 +1623,73 @@ export const StoryView: React.FC<StoryViewProps> = ({
                 </div>
               </motion.div>
             </div>
+
+            {/* Infinity 2026 (April 22 - 30) Feature Spotlight */}
+            <motion.div
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-6 p-6 rounded-3xl bg-gradient-to-r from-purple-950/40 via-zinc-900 to-black border border-purple-500/30 space-y-4"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-300">
+                    Flagship Festival • April 22 – 30, 2026
+                  </span>
+                </div>
+                <span className="text-xs text-gray-400 font-mono">
+                  Sourced from jain-fet-hub.vercel.app/timeline#2026-April
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <div className="text-xs font-mono font-bold text-purple-300 uppercase">
+                    30th April • Colosseum
+                  </div>
+                  <h4 className="text-base font-bold text-white">DJ Kayra (Kayra Wilson)</h4>
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    Bhopal sensation bringing high-octane Bolly Tech, Tech House, EDM, and Electro for the grand Colosseum finale.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <div className="text-xs font-mono font-bold text-blue-300 uppercase">
+                    29th April • Main Arena
+                  </div>
+                  <h4 className="text-base font-bold text-white">Raag: The Band</h4>
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    Seamless fusion of Indian Classical and Western Rock live concert celebrating creativity and youth culture.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <div className="text-xs font-mono font-bold text-emerald-300 uppercase">
+                    22 – 30 April • Campus-wide
+                  </div>
+                  <h4 className="text-base font-bold text-white">20+ Tech & Cultural Contests</h4>
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    ₹1,00,000+ prize pool across Veil of Verse Fashion (₹25k), Battle of Bands (₹15k), Grid Gambit, UAV Drone Challenge, and Red Trophy CTF.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-between">
+                <div className="text-xs text-gray-400 font-mono">
+                  All newly admitted Freshers & Lateral Entry students receive complimentary admission.
+                </div>
+                <button
+                  type="button"
+                  onClick={onOpenOrientation}
+                  className="px-4 py-2 rounded-xl bg-amber-400 text-black text-xs font-extrabold hover:bg-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
+                >
+                  <span>Explore Full Events Timeline</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       )}
