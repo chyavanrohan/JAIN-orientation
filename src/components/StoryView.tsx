@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   GraduationCap, 
@@ -40,6 +40,7 @@ import {
 import { LithosSpotlightHero } from './LithosSpotlightHero';
 import { JainLogo } from './JainLogo';
 import { LiveCampusWidget } from './LiveCampusWidget';
+import { FacultySection } from './FacultySection';
 
 interface StoryViewProps {
   onBackToHome?: () => void;
@@ -315,7 +316,25 @@ export const StoryView: React.FC<StoryViewProps> = ({
   onOpenAdmin
 }) => {
   const [viewMode, setViewMode] = useState<'lithos' | 'campus'>('campus');
-  const [activeSection, setActiveSection] = useState<'overview' | 'academics' | 'facilities' | 'hostels' | 'gallery' | 'placements' | 'life'>('overview');
+  const [activeSection, setActiveSection] = useState<'overview' | 'academics' | 'faculty' | 'facilities' | 'hostels' | 'gallery' | 'placements' | 'life'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('faculty') || window.location.hash.startsWith('#faculty')) {
+        return 'faculty';
+      }
+    }
+    return 'overview';
+  });
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('faculty') || window.location.hash.startsWith('#faculty')) {
+      setTimeout(() => {
+        const el = document.getElementById('campus-story-details');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    }
+  }, []);
   
   // Recruiter Search & Filter state
   const [recruiterFilter, setRecruiterFilter] = useState<string>('All');
@@ -576,7 +595,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="liquid-glass rounded-3xl p-8 md:p-12 mb-10 border border-white/20 bg-gradient-to-br from-black/90 via-black/80 to-black/95 shadow-2xl"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 mb-8 sm:mb-10 border border-white/20 bg-gradient-to-br from-black/90 via-black/80 to-black/95 shadow-2xl"
           >
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="inline-flex items-center gap-2 bg-white/10 px-3.5 py-1.5 rounded-full text-xs md:text-sm font-bold backdrop-blur-md border border-white/20 font-grotesk tracking-wider uppercase text-gray-200">
@@ -657,6 +676,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
         {[
           { id: 'overview', label: 'Overview & Ethos', icon: Compass },
           { id: 'academics', label: 'Academic Programs', icon: GraduationCap },
+          { id: 'faculty', label: 'Faculty Directory', icon: Users },
           { id: 'facilities', label: 'Campus & Infrastructure', icon: Building2 },
           { id: 'hostels', label: 'Hostel Accommodation', icon: Bed },
           { id: 'gallery', label: 'Photo Gallery & Media', icon: Camera },
@@ -691,22 +711,22 @@ export const StoryView: React.FC<StoryViewProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.15 }}
               transition={{ duration: 0.6 }}
-              className="liquid-glass rounded-3xl p-8 md:p-10 border border-white/15"
+              className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
             >
               <span className="text-xs font-bold font-grotesk text-gray-400 uppercase tracking-widest block mb-2">Campus Profile</span>
-              <h2 className="text-3xl md:text-4xl font-playfair italic font-bold mb-6 text-white leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-playfair italic font-bold mb-5 sm:mb-6 text-white leading-tight">
                 About SET Kanakapura Global Campus
               </h2>
 
-              <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-5 font-normal">
+              <p className="text-gray-300 text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-5 font-normal">
                 The School of Engineering and Technology (SET) at JAIN (Deemed-to-be University) is situated on a sprawling 300+ acre lush green Global Campus along Kanakapura Road, Bengaluru. Designed to foster intellectual curiosity and industry relevance, SET integrates cutting-edge engineering curriculum with hands-on research and entrepreneurial incubation.
               </p>
-              <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-8">
+              <p className="text-gray-300 text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8">
                 Accredited with <strong className="text-white font-semibold">NAAC A++ Grade</strong> and recognized globally for academic rigor, SET provides an environment where technology meets vision. Students work alongside renowned faculty, engage with industry mentors, and turn high-impact ideas into real-world applications.
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-6 border-t border-white/10">
-                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 pt-6 border-t border-white/10">
+                <div className="p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all">
                   <div className="flex items-center gap-2 text-white font-bold mb-2">
                     <Zap className="w-4 h-4 text-white" />
                     <span className="font-grotesk tracking-wide uppercase text-sm">Empowering Visionaries</span>
@@ -716,7 +736,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
                   </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all">
+                <div className="p-4 sm:p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all">
                   <div className="flex items-center gap-2 text-white font-bold mb-2">
                     <Cpu className="w-4 h-4 text-white" />
                     <span className="font-grotesk tracking-wide uppercase text-sm">Industry 4.0 Ready</span>
@@ -734,18 +754,18 @@ export const StoryView: React.FC<StoryViewProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6 }}
-              className="liquid-glass rounded-3xl p-8 border border-white/15"
+              className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/15"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <MapPin className="w-6 h-6 text-amber-400" />
-                <h2 className="text-2xl font-playfair italic font-bold text-white">Campus Location & Landmarks</h2>
+              <div className="flex items-center gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+                <MapPin className="w-5 sm:w-6 h-5 sm:h-6 text-amber-400 shrink-0" />
+                <h2 className="text-xl sm:text-2xl font-playfair italic font-bold text-white">Campus Location & Landmarks</h2>
               </div>
-              <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-5">
+              <p className="text-gray-300 text-xs sm:text-sm md:text-base leading-relaxed mb-5">
                 JAIN Global Campus, 45th km, NH-209, Jakkasandra Post, Kanakapura Taluk, Ramanagara District, Bengaluru, Karnataka - 562112.
               </p>
 
               {/* Key Campus Landmarks */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 mb-6">
                 <div className="p-3 bg-white/5 rounded-xl border border-white/10 text-xs">
                   <span className="font-bold text-white block mb-0.5">🏛️ Engineering Block</span>
                   <span className="text-gray-400 text-[11px]">CS, AI/ML, Aerospace & Robotics Labs</span>
@@ -764,25 +784,25 @@ export const StoryView: React.FC<StoryViewProps> = ({
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4 pt-2 border-t border-white/10">
+              <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-white/10">
                 <a
                   href="https://maps.google.com/?q=Jain+University+Kanakapura+Campus"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-white/20 font-grotesk tracking-wider uppercase shadow-md cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-black hover:bg-gray-200 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-white/20 font-grotesk tracking-wider uppercase shadow-md cursor-pointer active:scale-95"
                 >
-                  <MapPin className="w-4 h-4" />
+                  <MapPin className="w-4 h-4 shrink-0" />
                   <span>Open Location in Google Maps</span>
                 </a>
                 <a
                   href="https://jainsmartnavigation.ai.studio/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-amber-400 text-black hover:bg-amber-300 px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-amber-300 font-grotesk tracking-wider uppercase shadow-lg hover:scale-[1.02] active:scale-98 cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-amber-400 text-black hover:bg-amber-300 px-4 sm:px-5 py-2.5 rounded-xl text-xs font-extrabold transition-all border border-amber-300 font-grotesk tracking-wider uppercase shadow-lg hover:scale-[1.02] active:scale-95 cursor-pointer"
                 >
-                  <Compass className="w-4 h-4 text-black stroke-[2.5]" />
+                  <Compass className="w-4 h-4 text-black stroke-[2.5] shrink-0" />
                   <span>JAIN Smart Navigation App</span>
-                  <ArrowUpRight className="w-4 h-4 text-black stroke-[2.5]" />
+                  <ArrowUpRight className="w-4 h-4 text-black stroke-[2.5] shrink-0" />
                 </a>
               </div>
             </motion.div>
@@ -794,14 +814,14 @@ export const StoryView: React.FC<StoryViewProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="liquid-glass rounded-3xl p-6 md:p-8 border border-white/15"
+              className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/15"
             >
               <h3 className="text-xl font-playfair italic font-bold mb-5 text-white">Quick Admissions & Orientation</h3>
               <div className="space-y-3.5">
                 <button
                   type="button"
                   onClick={onOpenOrientation}
-                  className="w-full bg-white text-black py-3.5 px-5 rounded-xl font-extrabold text-xs uppercase tracking-wider font-grotesk hover:bg-gray-200 transition-all flex items-center justify-between cursor-pointer shadow-lg"
+                  className="w-full bg-white text-black py-3.5 px-5 rounded-xl font-extrabold text-xs uppercase tracking-wider font-grotesk hover:bg-gray-200 transition-all flex items-center justify-between cursor-pointer shadow-lg active:scale-95"
                 >
                   <span>Orientation Schedule</span>
                   <ChevronRight className="w-4 h-4" />
@@ -812,7 +832,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
                     if (onOpenTimetable) onOpenTimetable();
                     else window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="w-full liquid-glass text-white py-3.5 px-5 rounded-xl font-extrabold text-xs uppercase tracking-wider font-grotesk hover:bg-white/10 transition-all flex items-center justify-between border border-white/20 cursor-pointer"
+                  className="w-full liquid-glass text-white py-3.5 px-5 rounded-xl font-extrabold text-xs uppercase tracking-wider font-grotesk hover:bg-white/10 transition-all flex items-center justify-between border border-white/20 cursor-pointer active:scale-95"
                 >
                   <span>All Classes Timetables Matrix</span>
                   <ChevronRight className="w-4 h-4" />
@@ -825,7 +845,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="liquid-glass rounded-3xl p-6 md:p-8 border border-white/15"
+              className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/15"
             >
               <h3 className="text-xl font-playfair italic font-bold mb-4 text-white">Why Choose JAIN SET?</h3>
               <ul className="space-y-3 text-xs md:text-sm text-gray-300 leading-relaxed">
@@ -854,7 +874,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="liquid-glass rounded-3xl p-6 md:p-8 border border-amber-400/40 overflow-hidden space-y-4 shadow-2xl relative bg-gradient-to-b from-amber-500/10 via-zinc-950/80 to-black"
+              className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-amber-400/40 overflow-hidden space-y-4 shadow-2xl relative bg-gradient-to-b from-amber-500/10 via-zinc-950/80 to-black"
             >
               <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
                 <div className="flex items-center gap-3">
@@ -1003,7 +1023,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-3xl p-8 md:p-10 border border-white/15"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
           >
             <span className="text-xs font-bold font-grotesk text-gray-400 uppercase tracking-widest block mb-2">Curriculum Excellence</span>
             <h2 className="text-3xl md:text-4xl font-playfair italic font-bold text-white mb-3">Academic Engineering Programs</h2>
@@ -1036,6 +1056,10 @@ export const StoryView: React.FC<StoryViewProps> = ({
         </div>
       )}
 
+      {activeSection === 'faculty' && (
+        <FacultySection />
+      )}
+
       {activeSection === 'facilities' && (
         <div className="space-y-8">
           <motion.div
@@ -1043,7 +1067,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-3xl p-8 md:p-10 border border-white/15"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
           >
             <span className="text-xs font-bold font-grotesk text-gray-400 uppercase tracking-widest block mb-2">Infrastructure & Labs</span>
             <h2 className="text-3xl md:text-4xl font-playfair italic font-bold text-white mb-3">World-Class Campus Ecosystem</h2>
@@ -1162,7 +1186,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-3xl p-6 md:p-10 border border-white/15 space-y-8"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15 space-y-6 sm:space-y-8"
           >
             {/* Section Header */}
             <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/15 pb-6">
@@ -1248,7 +1272,11 @@ export const StoryView: React.FC<StoryViewProps> = ({
               </div>
 
               <div className="overflow-x-auto border border-white/15 rounded-2xl bg-black/50">
-                <table className="w-full text-left text-xs">
+                <div className="sm:hidden px-3 py-1.5 text-[10px] text-gray-400 font-mono bg-white/5 border-b border-white/10 flex items-center justify-between">
+                  <span>← Swipe table horizontally for fee breakdown →</span>
+                  <span className="text-amber-400 font-bold">2026–27 Fees</span>
+                </div>
+                <table className="w-full text-left text-xs min-w-[620px]">
                   <thead className="bg-zinc-900 border-b border-white/15 text-gray-400 uppercase text-[10px] font-mono">
                     <tr>
                       <th className="py-3 px-4">Campus & Accommodation Type</th>
@@ -1452,7 +1480,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-3xl p-8 md:p-10 border border-white/15"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
           >
             <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
               <div>
@@ -1465,13 +1493,13 @@ export const StoryView: React.FC<StoryViewProps> = ({
                 </p>
               </div>
 
-              {/* Gallery Filters */}
-              <div className="flex flex-wrap items-center gap-2">
+              {/* Gallery Filters - Swipeable on phone */}
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 flex-nowrap sm:flex-wrap">
                 {['All', 'Campus Architecture', 'Advanced Labs', 'Incubation & Startups', 'Sports Arena', 'Academic Facilities', 'Student Housing'].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setGalleryFilter(cat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer font-grotesk ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer font-grotesk shrink-0 active:scale-95 whitespace-nowrap ${
                       galleryFilter === cat
                         ? 'bg-amber-400 text-black font-extrabold shadow-md scale-105'
                         : 'bg-white/5 hover:bg-white/15 text-gray-300 border border-white/10'
@@ -1535,7 +1563,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-3xl p-8 md:p-10 border border-white/15 bg-gradient-to-r from-black/80 via-black/90 to-black"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15 bg-gradient-to-r from-black/80 via-black/90 to-black"
           >
             <div className="flex flex-wrap items-start justify-between gap-6 mb-8">
               <div>
@@ -1585,7 +1613,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-3xl p-8 md:p-10 border border-white/15"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
           >
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 pb-6 border-b border-white/10">
               <div>
@@ -1611,14 +1639,14 @@ export const StoryView: React.FC<StoryViewProps> = ({
               </div>
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center gap-2 mb-8">
+            {/* Category Filter Pills - Swipeable on phone */}
+            <div className="flex items-center gap-2 mb-8 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 flex-nowrap sm:flex-wrap">
               {['All', 'Tech & AI', 'Core & Automotive', 'Consulting & Finance', 'Global IT'].map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setRecruiterFilter(cat)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-extrabold uppercase font-grotesk tracking-wider transition-all cursor-pointer ${
+                  className={`px-4 py-1.5 rounded-full text-xs font-extrabold uppercase font-grotesk tracking-wider transition-all cursor-pointer shrink-0 active:scale-95 whitespace-nowrap ${
                     recruiterFilter === cat
                       ? 'bg-white text-black shadow-md scale-105'
                       : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white border border-white/10'
@@ -1685,7 +1713,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-3xl p-8 md:p-10 border border-white/15"
+            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
           >
             <span className="text-xs font-bold font-grotesk text-gray-400 uppercase tracking-widest block mb-2">Student Ecosystem</span>
             <h2 className="text-3xl md:text-4xl font-playfair italic font-bold text-white mb-3">Campus Life, Culture & Clubs</h2>
