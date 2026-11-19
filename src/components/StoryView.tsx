@@ -35,12 +35,14 @@ import {
   Mail,
   Clock,
   Calendar,
-  ShieldCheck
+  ShieldCheck,
+  Terminal
 } from 'lucide-react';
 import { LithosSpotlightHero } from './LithosSpotlightHero';
 import { JainLogo } from './JainLogo';
 import { LiveCampusWidget } from './LiveCampusWidget';
 import { FacultySection } from './FacultySection';
+import { PythonLabSection } from './PythonLabSection';
 
 interface StoryViewProps {
   onBackToHome?: () => void;
@@ -316,11 +318,14 @@ export const StoryView: React.FC<StoryViewProps> = ({
   onOpenAdmin
 }) => {
   const [viewMode, setViewMode] = useState<'lithos' | 'campus'>('campus');
-  const [activeSection, setActiveSection] = useState<'overview' | 'academics' | 'faculty' | 'facilities' | 'hostels' | 'gallery' | 'placements' | 'life'>(() => {
+  const [activeSection, setActiveSection] = useState<'overview' | 'academics' | 'faculty' | 'python-lab' | 'facilities' | 'hostels' | 'gallery' | 'placements' | 'life'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('faculty') || window.location.hash.startsWith('#faculty')) {
         return 'faculty';
+      }
+      if (params.get('tab') === 'python-lab' || window.location.hash === '#python-lab') {
+        return 'python-lab';
       }
     }
     return 'overview';
@@ -328,7 +333,12 @@ export const StoryView: React.FC<StoryViewProps> = ({
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('faculty') || window.location.hash.startsWith('#faculty')) {
+    if (
+      params.get('faculty') ||
+      window.location.hash.startsWith('#faculty') ||
+      params.get('tab') === 'python-lab' ||
+      window.location.hash === '#python-lab'
+    ) {
       setTimeout(() => {
         const el = document.getElementById('campus-story-details');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -677,6 +687,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
           { id: 'overview', label: 'Overview & Ethos', icon: Compass },
           { id: 'academics', label: 'Academic Programs', icon: GraduationCap },
           { id: 'faculty', label: 'Faculty Directory', icon: Users },
+          { id: 'python-lab', label: 'Python Lab', icon: Terminal },
           { id: 'facilities', label: 'Campus & Infrastructure', icon: Building2 },
           { id: 'hostels', label: 'Hostel Accommodation', icon: Bed },
           { id: 'gallery', label: 'Photo Gallery & Media', icon: Camera },
@@ -1058,6 +1069,10 @@ export const StoryView: React.FC<StoryViewProps> = ({
 
       {activeSection === 'faculty' && (
         <FacultySection />
+      )}
+
+      {activeSection === 'python-lab' && (
+        <PythonLabSection />
       )}
 
       {activeSection === 'facilities' && (
