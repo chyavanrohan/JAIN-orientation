@@ -23,7 +23,6 @@ import {
   Briefcase,
   Zap,
   ArrowUpRight,
-  Camera,
   X,
   Maximize2,
   Image as ImageIcon,
@@ -36,13 +35,19 @@ import {
   Clock,
   Calendar,
   ShieldCheck,
-  Terminal
+  Calculator
 } from 'lucide-react';
 import { LithosSpotlightHero } from './LithosSpotlightHero';
 import { JainLogo } from './JainLogo';
 import { LiveCampusWidget } from './LiveCampusWidget';
 import { FacultySection } from './FacultySection';
 import { PythonLabSection } from './PythonLabSection';
+import {
+  HOSTEL_PHOTOS,
+  HOSTEL_FACILITY_SYMBOLS,
+  OFFICIAL_SET_HOSTEL_URL,
+  type HostelSymbolCategory,
+} from '../data/hostelFacilitiesData';
 
 interface StoryViewProps {
   onBackToHome?: () => void;
@@ -318,13 +323,18 @@ export const StoryView: React.FC<StoryViewProps> = ({
   onOpenAdmin
 }) => {
   const [viewMode, setViewMode] = useState<'lithos' | 'campus'>('campus');
-  const [activeSection, setActiveSection] = useState<'overview' | 'academics' | 'faculty' | 'python-lab' | 'facilities' | 'hostels' | 'gallery' | 'placements' | 'life'>(() => {
+  const [activeSection, setActiveSection] = useState<'overview' | 'academics' | 'faculty' | 'python-lab' | 'facilities' | 'hostels' | 'placements' | 'life'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('faculty') || window.location.hash.startsWith('#faculty')) {
         return 'faculty';
       }
-      if (params.get('tab') === 'python-lab' || window.location.hash === '#python-lab') {
+      if (
+        params.get('tab') === 'calculator' ||
+        params.get('tab') === 'python-lab' ||
+        window.location.hash === '#calculator' ||
+        window.location.hash === '#python-lab'
+      ) {
         return 'python-lab';
       }
     }
@@ -336,7 +346,9 @@ export const StoryView: React.FC<StoryViewProps> = ({
     if (
       params.get('faculty') ||
       window.location.hash.startsWith('#faculty') ||
+      params.get('tab') === 'calculator' ||
       params.get('tab') === 'python-lab' ||
+      window.location.hash === '#calculator' ||
       window.location.hash === '#python-lab'
     ) {
       setTimeout(() => {
@@ -351,14 +363,16 @@ export const StoryView: React.FC<StoryViewProps> = ({
   const [recruiterSearch, setRecruiterSearch] = useState<string>('');
   const [selectedRecruiter, setSelectedRecruiter] = useState<RecruiterPartner | null>(null);
 
-  // Gallery & Lightbox state
+  // Infrastructure & Lightbox state
   const [selectedGalleryImage, setSelectedGalleryImage] = useState<{
     url: string;
     title: string;
     category: string;
     desc: string;
+    highlights?: string[];
   } | null>(null);
-  const [galleryFilter, setGalleryFilter] = useState<string>('All');
+  const [infraFilter, setInfraFilter] = useState<'All' | 'Academic & Campus' | 'Residential & Dining' | 'Sports Facilities'>('All');
+  const [hostelSymbolFilter, setHostelSymbolFilter] = useState<'All' | HostelSymbolCategory>('All');
 
   const filteredRecruiters = RECRUITERS.filter((r) => {
     const matchesCategory = recruiterFilter === 'All' || r.category === recruiterFilter;
@@ -387,123 +401,128 @@ export const StoryView: React.FC<StoryViewProps> = ({
     { icon: Globe2, label: 'Global Tie-ups', value: '50+ International Universities' },
   ];
 
-  const campusPhotos = [
+  const infrastructureFacilities: {
+    title: string;
+    category: 'Academic & Campus' | 'Residential & Dining' | 'Sports Facilities';
+    image: string;
+    remoteImage: string;
+    desc: string;
+    highlights?: string[];
+  }[] = [
     {
-      title: 'JU SET Main Academic Facade',
-      category: 'Campus Architecture',
-      url: 'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop',
-      desc: '300+ Acre eco-friendly Kanakapura Global Campus building surrounded by lush lawns and tropical foliage.'
+      title: 'The Library',
+      category: 'Academic & Campus',
+      image: '/infrastructure/library-Jain-university.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/infrastructure/library-Jain-university.jpg',
+      desc: 'As the center of academic life at JU-SET, the library provides specialist librarian support, study spaces for over 100 readers, ~30,000 books, 120+ national and international periodicals, and extensive electronic resources.',
+      highlights: [
+        'Study space for more than 100 readers',
+        'Collection of ~30,000 books plus CDs, DVDs, and journals',
+        '120+ national and international periodicals & e-resources',
+        'Self-service kiosks for borrowing/returning books & internet PCs',
+      ],
     },
     {
-      title: 'NVIDIA AI & High Performance Computing Lab',
-      category: 'Advanced Labs',
-      url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200&auto=format&fit=crop',
-      desc: 'State-of-the-art AI supercomputing node for machine learning, deep neural network training, and computer vision.'
+      title: 'Information Technology Services',
+      category: 'Academic & Campus',
+      image: '/infrastructure/information-technology-services.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/infrastructure/information-technology-services.jpg',
+      desc: 'JU-FET provides a broad range of computer-based services with campus-wide Wi-Fi connectivity and dedicated computers across classrooms and laboratories to support every engineering program.',
     },
     {
-      title: 'JU Incubation Centre (JU-CEIEE)',
-      category: 'Incubation & Startups',
-      url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop',
-      desc: 'Dedicated startup accelerator and innovation workspace providing seed capital and mentorship to student founders.'
+      title: 'Technology Enabled Classrooms',
+      category: 'Academic & Campus',
+      image: '/infrastructure/technology-enabled-classrooms.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/infrastructure/technology-enabled-classrooms.jpg',
+      desc: 'High-tech smart classrooms equipped under one umbrella with high-speed internet connectivity, interactive audio-visual projection, and technical learning tools.',
     },
     {
-      title: 'Sprint Olympic Sports Complex & Aquatics',
-      category: 'Sports Arena',
-      url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200&auto=format&fit=crop',
-      desc: 'World-class sports infrastructure featuring multi-sport courts, indoor arena, gymnasium, and athletic tracks.'
+      title: 'Seminar Hall',
+      category: 'Academic & Campus',
+      image: '/infrastructure/seminar-hall-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/infrastructure/seminar-hall-Jain-University.jpg',
+      desc: 'Built in theatre style for technical seminars, guest talks, student club activities, workshops, and corporate campus recruitment drives.',
     },
     {
-      title: 'Central Knowledge Hub & Digital Library',
-      category: 'Academic Facilities',
-      url: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=1200&auto=format&fit=crop',
-      desc: 'Multi-tiered quiet study zone and digital repository connected to IEEE Xplore, ScienceDirect, and global journals.'
+      title: 'Auditorium',
+      category: 'Academic & Campus',
+      image: '/infrastructure/auditorium-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/infrastructure/auditorium-Jain-University.jpg',
+      desc: 'Acoustically engineered, state-of-the-art auditorium designed to host corporate summits, academic conferences, cultural fests, and institutional events.',
     },
     {
-      title: 'Computer Science & Software Studio',
-      category: 'Advanced Labs',
-      url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop',
-      desc: 'High-speed fiber-networked workstations for full-stack software development, DevOps, and cloud engineering.'
+      title: 'Multi-Cuisine Cafeteria',
+      category: 'Residential & Dining',
+      image: '/infrastructure/multi-cuisine-cafeteria.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/infrastructure/multi-cuisine-cafeteria.jpg',
+      desc: 'A vibrant multi-cuisine dining space offering hygienic meals, snacks, and beverages where students collaborate on projects and unwind between classes.',
     },
     {
-      title: 'Kanakapura Global Campus Residential Towers (JU Hostels)',
-      category: 'Student Housing',
-      url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/JGI-hostel2.jpg',
-      desc: 'Official on-campus residential halls at JAIN Global Campus with separate blocks for boys and girls and 24/7 security.'
+      title: 'Accommodation (Global Campus Hostels)',
+      category: 'Residential & Dining',
+      image: '/infrastructure/accommodation-Jain-University28.png',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/infrastructure/accommodation-Jain-University28.png',
+      desc: 'Separate spacious on-campus residential hostels for boys and girls featuring dining, laundry, recreational rooms, warden supervision, medical checkups, and gymnasium access.',
     },
     {
-      title: 'Residential Suites & Furnished Student Rooms',
-      category: 'Student Housing',
-      url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/hostel-01.jpg',
-      desc: 'Bedrooms with en-suite bathrooms, well-ventilated and spacious, furnished with cot, bed, storage cupboards, study tables and chairs.'
+      title: 'Tennis Courts',
+      category: 'Sports Facilities',
+      image: '/infrastructure/Tennis-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/sports-facilities/Tennis-Jain-University.jpg',
+      desc: 'Six plexicushioned tennis courts built to international standards to give student athletes a professional training and tournament experience.',
     },
     {
-      title: 'Hostel Dining & Healthy Meal Platters',
-      category: 'Campus Dining',
-      url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/hostel-04.jpg',
-      desc: 'Delicious and healthy food for a variety of platters: breakfast, lunch, evening snacks, and dinner with cleanliness and variety.'
+      title: 'Basketball & Volleyball Courts',
+      category: 'Sports Facilities',
+      image: '/infrastructure/Basketball-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/sports-facilities/Basketball-Jain-University.jpg',
+      desc: 'Three dedicated volleyball courts and four basketball courts, including two floodlit basketball courts equipped for night-time practice.',
     },
     {
-      title: 'Housekeeping & Care Services in Hostels',
-      category: 'Student Housing',
-      url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/housekeeping.jpg',
-      desc: 'Designated housekeeping staff for each hall of residence ensuring daily cleanliness, hygiene, and comfort.'
+      title: 'Football Turf Grounds',
+      category: 'Sports Facilities',
+      image: '/infrastructure/Football-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/sports-facilities/Football-Jain-University.jpg',
+      desc: 'Two lush green international-standard turf football grounds fitted with automated pop-up sprinklers for competitive matches and daily practice.',
     },
     {
-      title: 'Smart Tech Amphitheatre Auditorium',
-      category: 'Campus Architecture',
-      url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop',
-      desc: 'Acoustically tuned venue hosting global tech summits, guest lectures, cultural fests, and hackathons.'
-    }
+      title: 'Badminton Arena',
+      category: 'Sports Facilities',
+      image: '/infrastructure/Badminton-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/sports-facilities/Badminton-Jain-University.jpg',
+      desc: 'Ten indoor badminton courts laid with professional synthetic flooring suited for high-performance training and recreational play.',
+    },
+    {
+      title: 'Table Tennis Hall',
+      category: 'Sports Facilities',
+      image: '/infrastructure/TableTennis-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/sports-facilities/TableTennis-Jain-University.jpg',
+      desc: 'Expansive indoor table tennis hall arranged with 15 tournament-grade tables for student practice and inter-collegiate events.',
+    },
+    {
+      title: 'Gym & Fitness Center',
+      category: 'Sports Facilities',
+      image: '/infrastructure/Gym-set-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/sports-facilities/Gym-set-Jain-University.jpg',
+      desc: '240 sq.m. modern cardio and weight-training center open to students, staff, and faculty for physical and mental wellness.',
+      highlights: [
+        'Area: 240 square meters with cardio & weight training equipment',
+        'Schedule: Monday to Saturday',
+        'Morning Hours: 5:30 AM – 7:30 AM · Evening Hours: 5:00 PM – 8:00 PM',
+      ],
+    },
+    {
+      title: 'Cricket Oval Ground',
+      category: 'Sports Facilities',
+      image: '/infrastructure/Cricket-Jain-University.jpg',
+      remoteImage: 'https://set.jainuniversity.ac.in/application/themes/set/assets/images/sports-facilities/Cricket-Jain-University.jpg',
+      desc: '2,00,000 sq. ft. international-standard lush green cricket oval featuring 5 central turf wickets alongside dedicated turf and cement practice pitches.',
+    },
   ];
 
-  const filteredPhotos = campusPhotos.filter((p) => {
-    return galleryFilter === 'All' || p.category === galleryFilter;
+  const filteredInfrastructure = infrastructureFacilities.filter((item) => {
+    return infraFilter === 'All' || item.category === infraFilter;
   });
-
-  const facilities = [
-    { 
-      title: 'JU Incubation Centre (JU-CEIEE)', 
-      desc: 'State-of-the-art incubation hub providing seed funding, mentorship, and prototyping labs for student entrepreneurs.',
-      image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop',
-      category: 'Incubation'
-    },
-    { 
-      title: 'Sprint Sports Complex', 
-      desc: 'World-class sporting facilities featuring an Olympic-grade running track, swimming pool, basketball courts, and indoor sports arena.',
-      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop',
-      category: 'Sports'
-    },
-    { 
-      title: 'Advanced AI & Supercomputing Labs', 
-      desc: 'Specialized research centers equipped with NVIDIA GPUs, Aerodynamics Wind Tunnels, VLSI testing, and Nano-tech labs.',
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop',
-      category: 'Research'
-    },
-    { 
-      title: 'Central Knowledge Hub', 
-      desc: 'Extensive multi-story digital library with direct subscription to IEEE, Springer, ScienceDirect, and global research databases.',
-      image: 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=800&auto=format&fit=crop',
-      category: 'Library'
-    },
-    { 
-      title: 'On-Campus Residential Hostels (JU-FET)', 
-      desc: 'Over 2,400+ students across 15 hostel blocks with attached washrooms, Sodexo 4-meal daily dining, ₹3 Lakh medical insurance, 24/7 ambulance, wardens (1:100), and fiber Wi-Fi.',
-      image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=800&auto=format&fit=crop',
-      category: 'Housing'
-    },
-    { 
-      title: 'Sodexo Central Dining Hall', 
-      desc: 'Multi-cuisine pure vegetarian dining with four daily meals (breakfast, lunch, evening snacks, dinner) operated by Sodexo.',
-      image: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?q=80&w=800&auto=format&fit=crop',
-      category: 'Dining'
-    },
-    { 
-      title: 'Innovation & Drone Sandbox', 
-      desc: '3D printing facilities, CNC machinery, autonomous drone flight testing zones, and IoT sensor sandbox environments.',
-      image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800&auto=format&fit=crop',
-      category: 'Innovation'
-    },
-  ];
 
   const scrollToDetails = () => {
     const el = document.getElementById('campus-story-details');
@@ -687,10 +706,9 @@ export const StoryView: React.FC<StoryViewProps> = ({
           { id: 'overview', label: 'Overview & Ethos', icon: Compass },
           { id: 'academics', label: 'Academic Programs', icon: GraduationCap },
           { id: 'faculty', label: 'Faculty Directory', icon: Users },
-          { id: 'python-lab', label: 'Python Lab', icon: Terminal },
+          { id: 'python-lab', label: 'Calculator', icon: Calculator },
           { id: 'facilities', label: 'Campus & Infrastructure', icon: Building2 },
           { id: 'hostels', label: 'Hostel Accommodation', icon: Bed },
-          { id: 'gallery', label: 'Photo Gallery & Media', icon: Camera },
           { id: 'placements', label: 'Placements & Recruiters', icon: Trophy },
           { id: 'life', label: 'Campus Life & Innovation', icon: BookOpen },
         ].map((tab) => {
@@ -1084,51 +1102,101 @@ export const StoryView: React.FC<StoryViewProps> = ({
             transition={{ duration: 0.6 }}
             className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
           >
-            <span className="text-xs font-bold font-grotesk text-gray-400 uppercase tracking-widest block mb-2">Infrastructure & Labs</span>
-            <h2 className="text-3xl md:text-4xl font-playfair italic font-bold text-white mb-3">World-Class Campus Ecosystem</h2>
-            <p className="text-gray-300 text-base max-w-3xl mb-8">
-              Designed to support immersive academic learning, research experimentation, and healthy campus living across 300+ acres.
-            </p>
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+              <div>
+                <span className="text-xs font-bold font-grotesk text-gray-400 uppercase tracking-widest block mb-2">Infrastructure & Facilities</span>
+                <h2 className="text-3xl md:text-4xl font-playfair italic font-bold text-white mb-2">World-Class Campus Infrastructure</h2>
+                <p className="text-gray-300 text-sm sm:text-base max-w-3xl">
+                  Official academic spaces, smart classrooms, residential hostels, and international-standard sporting facilities at JAIN (Deemed-to-be University) SET Global Campus.
+                </p>
+              </div>
+              <a
+                href="https://set.jainuniversity.ac.in/infrastructure"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-gray-200 hover:text-white transition-all whitespace-nowrap shrink-0"
+              >
+                <span>Official Infrastructure Page</span>
+                <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
+              </a>
+            </div>
+
+            {/* Category Filter Tabs */}
+            <div className="flex items-center gap-2 mb-8 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 flex-nowrap sm:flex-wrap">
+              {(['All', 'Academic & Campus', 'Residential & Dining', 'Sports Facilities'] as const).map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setInfraFilter(cat)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer font-grotesk shrink-0 whitespace-nowrap ${
+                    infraFilter === cat
+                      ? 'bg-white text-black font-extrabold shadow-md'
+                      : 'bg-white/5 hover:bg-white/15 text-gray-300 border border-white/10'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {facilities.map((fac, idx) => (
+              {filteredInfrastructure.map((fac, idx) => (
                 <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 25 }}
+                  key={fac.title}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.1 }}
-                  transition={{ duration: 0.45, delay: (idx % 6) * 0.08 }}
+                  transition={{ duration: 0.4, delay: (idx % 6) * 0.05 }}
                   className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden hover:border-white/30 transition-all group flex flex-col justify-between"
                 >
-                  <div className="relative h-48 w-full overflow-hidden bg-zinc-900">
-                    <img 
-                      src={fac.image} 
+                  <div className="relative aspect-[5/3] w-full overflow-hidden bg-zinc-900">
+                    <img
+                      src={fac.image}
                       alt={fac.title}
                       referrerPolicy="no-referrer"
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (target.dataset.fallbackTried !== '1' && fac.remoteImage) {
+                          target.dataset.fallbackTried = '1';
+                          target.src = fac.remoteImage;
+                        }
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <span className="absolute top-3 left-3 bg-black/80 backdrop-blur-md text-amber-300 border border-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                      {fac.category}
-                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
                     <button
                       type="button"
-                      onClick={() => setSelectedGalleryImage({ url: fac.image, title: fac.title, category: fac.category, desc: fac.desc })}
-                      className="absolute bottom-3 right-3 p-2 rounded-full bg-black/80 text-white hover:bg-white hover:text-black border border-white/20 transition-all cursor-pointer opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
-                      title="Expand High-Res Photo"
+                      onClick={() => setSelectedGalleryImage({ url: fac.image, title: fac.title, category: fac.category, desc: fac.desc, highlights: fac.highlights })}
+                      className="absolute bottom-3 right-3 p-2 rounded-full bg-black/80 text-white hover:bg-white hover:text-black border border-white/20 transition-all cursor-pointer opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                      title="Expand Infrastructure Photo"
+                      aria-label={`Expand ${fac.title} photo`}
                     >
                       <Maximize2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div className="p-5 flex-1 flex flex-col justify-between gap-4">
                     <div>
+                      <div className="text-[11px] font-medium text-amber-300/90 mb-1.5 font-grotesk">
+                        {fac.category} · JAIN SET Campus
+                      </div>
                       <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-200 transition-colors">{fac.title}</h3>
-                      <p className="text-xs text-gray-300 leading-relaxed mb-4">{fac.desc}</p>
+                      <p className="text-xs text-gray-300 leading-relaxed">{fac.desc}</p>
+                      {fac.highlights && fac.highlights.length > 0 && (
+                        <ul className="mt-3 pt-3 border-t border-white/10 space-y-1 text-[11px] text-gray-300">
+                          {fac.highlights.slice(0, 2).map((hl, hIdx) => (
+                            <li key={hIdx} className="flex items-start gap-1.5">
+                              <span className="text-amber-400 mt-0.5">•</span>
+                              <span>{hl}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                     <button
                       type="button"
-                      onClick={() => setSelectedGalleryImage({ url: fac.image, title: fac.title, category: fac.category, desc: fac.desc })}
-                      className="w-full py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/15 flex items-center justify-center gap-1.5 cursor-pointer"
+                      onClick={() => setSelectedGalleryImage({ url: fac.image, title: fac.title, category: fac.category, desc: fac.desc, highlights: fac.highlights })}
+                      className="w-full py-2.5 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/15 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
                     >
                       <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
                       <span>View Full Image & Details</span>
@@ -1222,12 +1290,12 @@ export const StoryView: React.FC<StoryViewProps> = ({
 
               <div className="flex flex-wrap items-center gap-3">
                 <a
-                  href="https://www.jainuniversity.ac.in/contact/hostel-accomodation"
+                  href={OFFICIAL_SET_HOSTEL_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-gray-200 hover:text-white transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-gray-200 hover:text-white transition-all flex items-center gap-1.5 whitespace-nowrap"
                 >
-                  <span>Official University Page</span>
+                  <span>Official SET Hostel Page</span>
                   <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
                 </a>
 
@@ -1353,79 +1421,117 @@ export const StoryView: React.FC<StoryViewProps> = ({
               </div>
             </div>
 
-            {/* Official Photo Gallery */}
+            {/* Official Hostel Facilities & Amenities (23 Official Symbols) */}
+            <div className="space-y-5 pt-4 border-t border-white/10">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-amber-400" />
+                    Hostel Facilities & Amenities
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Official residential, dining, security, wellness, and student engagement services from JAIN SET
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 flex-nowrap sm:flex-wrap">
+                  {(['All', 'Living & Care', 'Utilities & Safety', 'Dining & Sodexo', 'Recreation & Community'] as const).map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setHostelSymbolFilter(cat)}
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer font-grotesk shrink-0 whitespace-nowrap ${
+                        hostelSymbolFilter === cat
+                          ? 'bg-white text-black font-extrabold shadow-md'
+                          : 'bg-white/5 hover:bg-white/15 text-gray-300 border border-white/10'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {HOSTEL_FACILITY_SYMBOLS.filter(
+                  (sym) => hostelSymbolFilter === 'All' || sym.category === hostelSymbolFilter
+                ).map((sym) => (
+                  <div
+                    key={sym.id}
+                    className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/25 transition-all flex flex-col items-center text-center gap-3"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center p-3 shadow-md shrink-0">
+                      <img
+                        src={sym.iconPath}
+                        alt={sym.title}
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (target.dataset.fallbackTried !== '1' && sym.remoteIcon) {
+                            target.dataset.fallbackTried = '1';
+                            target.src = sym.remoteIcon;
+                          }
+                        }}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[11px] font-medium text-amber-300/90 font-grotesk mb-0.5">
+                        {sym.category}
+                      </div>
+                      <h4 className="text-sm font-bold text-white mb-1">{sym.title}</h4>
+                      <p className="text-xs text-gray-300 leading-relaxed">{sym.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Official Hostel Campus Photography */}
             <div className="space-y-4 pt-4 border-t border-white/10">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <h3 className="text-xl font-bold text-white flex items-center gap-2">
                     <Bed className="w-5 h-5 text-amber-400" />
                     Residential Facilities Photo Tour
                   </h3>
-                  <p className="text-xs text-gray-400">Verified photography from JAIN Global Campus Kanakapura</p>
+                  <p className="text-xs text-gray-400">Official hostel photography from JAIN (Deemed-to-be University) Global Campus</p>
                 </div>
                 <span className="text-xs text-gray-400">Click photo to expand full-screen</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {[
-                  {
-                    title: 'Global Campus Residential Towers',
-                    category: 'Exterior Architecture',
-                    url: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?q=80&w=1200&auto=format&fit=crop',
-                    desc: '15 On-campus residential blocks housing 2,400+ students with 24/7 security, wardens, ambulance, and solar hot water.'
-                  },
-                  {
-                    title: 'Student Suite (Double & Triple Sharing)',
-                    category: 'Bedrooms',
-                    url: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?q=80&w=1200&auto=format&fit=crop',
-                    desc: 'Spacious well-ventilated rooms with attached washrooms, individual study desks, wardrobes, and private balcony.'
-                  },
-                  {
-                    title: 'Sodexo Central Dining Hall',
-                    category: 'Dining & Food Services',
-                    url: 'https://images.unsplash.com/photo-1567521464027-f127ff144326?q=80&w=1200&auto=format&fit=crop',
-                    desc: 'Nutritious 4-meal daily catering managed by Sodexo: breakfast, lunch, evening snacks, and dinner with 100% pure vegetarian cuisine.'
-                  },
-                  {
-                    title: 'Indoor Recreation & Games Lounge',
-                    category: 'Recreation',
-                    url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop',
-                    desc: 'Recreation center with international-size snooker tables, table tennis, foosball, carrom, and board games.'
-                  },
-                  {
-                    title: 'Resident Fitness Center & Gym',
-                    category: 'Fitness & Health',
-                    url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200&auto=format&fit=crop',
-                    desc: 'Equipped with modern cardio and weight training machines, open daily for resident students.'
-                  },
-                  {
-                    title: 'Quiet Study & Digital Reading Hub',
-                    category: 'Study Spaces',
-                    url: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=1200&auto=format&fit=crop',
-                    desc: 'Silent air-conditioned study lounges equipped with high-speed fiber Wi-Fi and digital research access.'
-                  }
-                ].map((item, idx) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {HOSTEL_PHOTOS.map((item, idx) => (
                   <div
                     key={idx}
                     onClick={() => setSelectedGalleryImage({ url: item.url, title: item.title, category: item.category, desc: item.desc })}
-                    className="group rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all cursor-pointer"
+                    className="group rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all cursor-pointer flex flex-col justify-between"
                   >
                     <div className="relative h-44 w-full overflow-hidden bg-zinc-900">
                       <img
                         src={item.url}
                         alt={item.title}
                         referrerPolicy="no-referrer"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (target.dataset.fallbackTried !== '1' && item.remoteImage) {
+                            target.dataset.fallbackTried = '1';
+                            target.src = item.remoteImage;
+                          }
+                        }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                      <span className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-[10px] font-mono text-amber-300 font-bold uppercase">
-                        {item.category}
-                      </span>
-                      <div className="absolute bottom-2.5 right-2.5 p-1.5 rounded-full bg-black/70 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="absolute bottom-2.5 right-2.5 p-1.5 rounded-full bg-black/70 text-white opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         <Maximize2 className="w-4 h-4" />
                       </div>
                     </div>
                     <div className="p-4">
+                      <div className="text-[11px] font-medium text-amber-300/90 font-grotesk mb-1">
+                        {item.category}
+                      </div>
                       <h4 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors mb-1">
                         {item.title}
                       </h4>
@@ -1483,88 +1589,6 @@ export const StoryView: React.FC<StoryViewProps> = ({
               </div>
             </div>
 
-          </motion.div>
-        </div>
-      )}
-
-      {/* PHOTO GALLERY SECTION */}
-      {activeSection === 'gallery' && (
-        <div className="space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.6 }}
-            className="liquid-glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 border border-white/15"
-          >
-            <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
-              <div>
-                <span className="text-xs font-bold font-grotesk text-gray-400 uppercase tracking-widest block mb-1">High-Definition Visual Tour</span>
-                <h2 className="text-3xl md:text-4xl font-playfair italic font-bold text-white">
-                  JAIN SET Campus Photo Gallery
-                </h2>
-                <p className="text-gray-300 text-sm max-w-2xl mt-1">
-                  Explore high-definition imagery of our 300+ acre Kanakapura Global Campus, research facilities, incubation hubs, and student life.
-                </p>
-              </div>
-
-              {/* Gallery Filters - Swipeable on phone */}
-              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 flex-nowrap sm:flex-wrap">
-                {['All', 'Campus Architecture', 'Advanced Labs', 'Incubation & Startups', 'Sports Arena', 'Academic Facilities', 'Student Housing'].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setGalleryFilter(cat)}
-                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer font-grotesk shrink-0 active:scale-95 whitespace-nowrap ${
-                      galleryFilter === cat
-                        ? 'bg-amber-400 text-black font-extrabold shadow-md scale-105'
-                        : 'bg-white/5 hover:bg-white/15 text-gray-300 border border-white/10'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Photo Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {filteredPhotos.map((photo, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                  onClick={() => setSelectedGalleryImage(photo)}
-                  className="group relative rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 aspect-[4/3] cursor-pointer shadow-xl hover:border-amber-400/50 transition-all"
-                >
-                  <img
-                    src={photo.url}
-                    alt={photo.title}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-95 transition-opacity" />
-                  
-                  <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20 text-[9px] font-bold text-amber-300 uppercase tracking-widest">
-                    {photo.category}
-                  </div>
-
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-sm font-bold text-white leading-tight mb-1 group-hover:text-amber-200 transition-colors">
-                      {photo.title}
-                    </h3>
-                    <p className="text-[11px] text-gray-300 line-clamp-2 leading-relaxed">
-                      {photo.desc}
-                    </p>
-                  </div>
-
-                  <div className="absolute top-3 right-3 p-2 rounded-full bg-black/70 text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Maximize2 className="w-3.5 h-3.5 text-white" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
           </motion.div>
         </div>
       )}
@@ -1848,36 +1872,48 @@ export const StoryView: React.FC<StoryViewProps> = ({
         </div>
       )}
 
-      {/* Photo Lightbox Gallery Modal Popup */}
+      {/* Infrastructure & Photo Lightbox Modal Popup */}
       {selectedGalleryImage && (
         <div className="fixed inset-0 z-[140] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-8 animate-fadeIn">
           <div className="bg-zinc-950 border border-white/20 rounded-3xl max-w-4xl w-full overflow-hidden relative shadow-2xl text-white flex flex-col max-h-[90vh]">
-            <div className="relative h-[55vh] w-full bg-black flex items-center justify-center overflow-hidden">
+            <div className="relative h-[45vh] sm:h-[52vh] w-full bg-black flex items-center justify-center overflow-hidden">
               <img
                 src={selectedGalleryImage.url}
                 alt={selectedGalleryImage.title}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain bg-zinc-950"
               />
               <button
                 type="button"
                 onClick={() => setSelectedGalleryImage(null)}
+                aria-label="Close image viewer"
                 className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/80 hover:bg-white hover:text-black border border-white/20 text-white flex items-center justify-center font-bold cursor-pointer transition-all shadow-xl"
               >
                 <X className="w-5 h-5" />
               </button>
-              <div className="absolute bottom-3 left-4 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 text-xs font-bold text-amber-300 uppercase tracking-wider">
-                {selectedGalleryImage.category}
-              </div>
             </div>
 
             <div className="p-6 md:p-8 flex-1 overflow-y-auto">
+              <div className="text-xs font-medium text-amber-300 font-grotesk mb-1">
+                {selectedGalleryImage.category} · JAIN SET Infrastructure
+              </div>
               <h3 className="text-2xl md:text-3xl font-playfair italic font-bold text-white mb-2">
                 {selectedGalleryImage.title}
               </h3>
-              <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6">
+              <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-4">
                 {selectedGalleryImage.desc}
               </p>
+
+              {selectedGalleryImage.highlights && selectedGalleryImage.highlights.length > 0 && (
+                <ul className="mb-6 p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-xs text-gray-200">
+                  {selectedGalleryImage.highlights.map((hl, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <span>{hl}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
               <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
                 <div className="flex items-center gap-2 text-xs text-gray-400 font-grotesk">
@@ -1887,7 +1923,7 @@ export const StoryView: React.FC<StoryViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setSelectedGalleryImage(null)}
-                  className="px-6 py-2.5 rounded-xl bg-white text-black font-extrabold text-xs uppercase tracking-wider hover:bg-gray-200 transition-colors cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-white text-black font-extrabold text-xs uppercase tracking-wider hover:bg-gray-200 transition-colors cursor-pointer whitespace-nowrap"
                 >
                   Close Viewer
                 </button>

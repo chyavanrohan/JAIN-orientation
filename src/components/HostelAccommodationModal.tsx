@@ -10,19 +10,20 @@ import {
   MapPin, 
   Sparkles, 
   CheckCircle2, 
-  Wifi, 
-  HeartPulse, 
-  Dumbbell, 
-  Gamepad2, 
   Clock, 
   ExternalLink,
   ChevronRight,
   Maximize2,
   DollarSign,
-  Bus,
   Droplet,
   Send
 } from 'lucide-react';
+import {
+  HOSTEL_PHOTOS,
+  HOSTEL_FACILITY_SYMBOLS,
+  OFFICIAL_SET_HOSTEL_URL,
+  type HostelPhotoItem,
+} from '../data/hostelFacilitiesData';
 
 interface HostelAccommodationModalProps {
   isOpen: boolean;
@@ -30,65 +31,13 @@ interface HostelAccommodationModalProps {
   onOpenOrientation?: () => void;
 }
 
-interface HostelPhoto {
-  title: string;
-  category: string;
-  url: string;
-  desc: string;
-}
-
-const HOSTEL_PHOTOS: HostelPhoto[] = [
-  {
-    title: 'JGI Global Campus Residential Towers',
-    category: 'Campus Living',
-    url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/JGI-hostel2.jpg',
-    desc: 'JAIN (Deemed-to-be University) Hostels - a home away from home, offering on-campus living at JAIN Global Campus with separate blocks for boys and girls.'
-  },
-  {
-    title: 'Residential Suites & Bedrooms',
-    category: 'Bedrooms & Suites',
-    url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/hostel-01.jpg',
-    desc: 'All residential halls contain bedrooms with en-suite bathrooms. Well ventilated and spacious, each room comes with adequate lighting and modern furniture.'
-  },
-  {
-    title: 'Hostel Campus Grounds & Environment',
-    category: 'Hostel Campus',
-    url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/hostel-02.jpg',
-    desc: 'Guided strictly by the sense of comfort and quality life for our students, managed by the university Hostel Management Division.'
-  },
-  {
-    title: 'Housekeeping Services in JAIN Hostel',
-    category: 'Housekeeping & Care',
-    url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/housekeeping.jpg',
-    desc: 'Each hall of residence has its own designated housekeeping staff ensuring daily cleaning, hygiene, and well-maintained living conditions.'
-  },
-  {
-    title: 'Hostel Food & Dining Halls',
-    category: 'Dining & Food',
-    url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/hostel-04.jpg',
-    desc: 'Kitchen staff constantly rolls out delicious and healthy food for a variety of platters. Dining includes breakfast, lunch, evening snacks, and dinner.'
-  },
-  {
-    title: '24/7 Security & Surveillance Staff',
-    category: 'Security & Safety',
-    url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/hostel-05.jpg',
-    desc: 'Each Residential Hall is covered by trained security staff 24 by 7. Besides, there are emergency hotline numbers available at all times.'
-  },
-  {
-    title: 'Furnished Student Accommodations',
-    category: 'Student Suites',
-    url: 'https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/JGI-hostel.jpg',
-    desc: 'Well furnished to fit student needs: each suite comes with a cot, bed, cupboard for storage, study tables, and ergonomic chairs.'
-  }
-];
-
 export const HostelAccommodationModal: React.FC<HostelAccommodationModalProps> = ({
   isOpen,
   onClose,
   onOpenOrientation
 }) => {
   const [activeTab, setActiveTab] = useState<'photos' | 'fees' | 'dining' | 'amenities' | 'contact'>('photos');
-  const [selectedPhoto, setSelectedPhoto] = useState<HostelPhoto | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<HostelPhotoItem | null>(null);
   const [bookingSubmitted, setBookingSubmitted] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
@@ -132,12 +81,12 @@ export const HostelAccommodationModal: React.FC<HostelAccommodationModalProps> =
 
           <div className="flex items-center gap-2">
             <a
-              href="https://www.jainuniversity.ac.in/contact/hostel-accomodation"
+              href={OFFICIAL_SET_HOSTEL_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs text-gray-200 border border-white/15 transition-all"
             >
-              <span>Official Site Page</span>
+              <span>Official SET Hostel Page</span>
               <ExternalLink className="w-3 h-3 text-amber-400" />
             </a>
 
@@ -237,6 +186,14 @@ export const HostelAccommodationModal: React.FC<HostelAccommodationModalProps> =
                         src={photo.url}
                         alt={photo.title}
                         referrerPolicy="no-referrer"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (target.dataset.fallbackTried !== '1' && photo.remoteImage) {
+                            target.dataset.fallbackTried = '1';
+                            target.src = photo.remoteImage;
+                          }
+                        }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
@@ -354,8 +311,8 @@ export const HostelAccommodationModal: React.FC<HostelAccommodationModalProps> =
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                 <div className="relative h-64 rounded-2xl overflow-hidden border border-white/15">
                   <img
-                    src="https://www.jainuniversity.ac.in/jain/theme/assets/images/contact/hostel-04.jpg"
-                    alt="Hostel Food at jain university"
+                    src="/hostel/hostel-04.jpg"
+                    alt="Hostel Food at JAIN University"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover"
                   />
@@ -411,66 +368,35 @@ export const HostelAccommodationModal: React.FC<HostelAccommodationModalProps> =
           {/* TAB 4: AMENITIES & SAFETY */}
           {activeTab === 'amenities' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-amber-400/15 text-amber-400 w-fit">
-                    <Bed className="w-5 h-5" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {HOSTEL_FACILITY_SYMBOLS.map((sym) => (
+                  <div
+                    key={sym.id}
+                    className="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center text-center gap-3"
+                  >
+                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center p-2.5 shadow-md shrink-0">
+                      <img
+                        src={sym.iconPath}
+                        alt={sym.title}
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (target.dataset.fallbackTried !== '1' && sym.remoteIcon) {
+                            target.dataset.fallbackTried = '1';
+                            target.src = sym.remoteIcon;
+                          }
+                        }}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-[11px] font-medium text-amber-300/90 mb-0.5">{sym.category}</div>
+                      <h4 className="text-sm font-bold text-white mb-1">{sym.title}</h4>
+                      <p className="text-xs text-gray-300 leading-relaxed">{sym.desc}</p>
+                    </div>
                   </div>
-                  <h4 className="text-sm font-bold text-white">Residential Suites</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    All the residential halls contain bedrooms with en suite bathrooms. Well ventilated and spacious, each room comes with adequate lighting facilities.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-emerald-400/15 text-emerald-400 w-fit">
-                    <Building2 className="w-5 h-5" />
-                  </div>
-                  <h4 className="text-sm font-bold text-white">Furniture Provided</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    The residential suites are well furnished to fit the needs of students. Each suite comes with a cot, bed, cupboard for storage, tables, and chairs.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-sky-400/15 text-sky-400 w-fit">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <h4 className="text-sm font-bold text-white">Housekeeping Services</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    Each hall of residence has its own designated housekeeping staff ensuring continuous cleanliness, waste disposal, and hygiene.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-red-500/15 text-red-400 w-fit">
-                    <ShieldCheck className="w-5 h-5" />
-                  </div>
-                  <h4 className="text-sm font-bold text-white">24x7 Security Staff</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    Each Residential Hall is covered by trained security staff 24 by 7. Besides, there are hotline numbers that can be contacted in times of emergency.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-purple-400/15 text-purple-400 w-fit">
-                    <Wifi className="w-5 h-5" />
-                  </div>
-                  <h4 className="text-sm font-bold text-white">High-Speed Wi-Fi</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    Seamless internet connectivity across student residential halls, quiet study hubs, and recreational lounges.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="p-2.5 rounded-xl bg-blue-400/15 text-blue-400 w-fit">
-                    <HeartPulse className="w-5 h-5" />
-                  </div>
-                  <h4 className="text-sm font-bold text-white">Medical & Emergency Care</h4>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    Emergency hotline response, on-campus health clinic, resident medical staff, and 24/7 ambulance coverage.
-                  </p>
-                </div>
+                ))}
               </div>
             </div>
           )}

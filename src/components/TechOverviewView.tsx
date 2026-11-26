@@ -176,8 +176,8 @@ if __name__ == '__main__':
                 <p className="text-base font-bold text-white mt-1">React 19 + Vite 6</p>
               </div>
               <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
-                <p className="text-xs text-gray-400 font-medium">Media & Gallery</p>
-                <p className="text-base font-bold text-white mt-1">HD Photo Lightbox</p>
+                <p className="text-xs text-gray-400 font-medium">Campus Infrastructure</p>
+                <p className="text-base font-bold text-white mt-1">14 Verified Facilities</p>
               </div>
               <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
                 <p className="text-xs text-gray-400 font-medium">Backup Suite</p>
@@ -255,10 +255,10 @@ if __name__ == '__main__':
                 <div className="p-5 bg-white/5 rounded-2xl border border-white/10 space-y-2">
                   <div className="flex items-center gap-2 text-white font-bold text-sm">
                     <Camera className="w-4 h-4 text-amber-300" />
-                    <span>HD Photo Gallery & Lightbox</span>
+                    <span>Official Campus Infrastructure</span>
                   </div>
                   <p className="text-xs text-gray-300 leading-relaxed">
-                    High-definition campus photography categorized by Architecture, AI/NVIDIA Labs, Incubation, Sports, and Housing with full-screen lightbox viewing.
+                    Verified photography and facility guides from JAIN SET across Library, Smart Classrooms, Seminar Halls, Hostels, and Sports arenas.
                   </p>
                 </div>
 
