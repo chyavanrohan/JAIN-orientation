@@ -3,13 +3,11 @@ import {
   Clock, 
   Sun, 
   Wind, 
-  MapPin, 
-  GraduationCap
+  MapPin
 } from 'lucide-react';
 
 export const LiveCampusWidget: React.FC = () => {
   const [time, setTime] = useState<string>('');
-  const [visitorCount, setVisitorCount] = useState<number>(1488);
 
   // Live IST Clock Update
   useEffect(() => {
@@ -27,16 +25,6 @@ export const LiveCampusWidget: React.FC = () => {
 
     updateClock();
     const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Subtle live visitor counter simulation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (Math.random() > 0.6) {
-        setVisitorCount((prev) => prev + (Math.random() > 0.5 ? 1 : -1));
-      }
-    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -65,7 +53,7 @@ export const LiveCampusWidget: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Live Weather, AQI & Live Freshmen counter */}
+        {/* Right: Live Weather & AQI */}
         <div className="flex flex-wrap items-center gap-3 md:gap-4 text-gray-300">
           <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
             <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '20s' }} />
@@ -77,11 +65,6 @@ export const LiveCampusWidget: React.FC = () => {
             <Wind className="w-3.5 h-3.5 text-cyan-400" />
             <span className="text-gray-400">AQI:</span>
             <span className="font-bold text-emerald-400">38 (Good)</span>
-          </div>
-
-          <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1 rounded-full text-amber-300">
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span className="font-semibold">{visitorCount.toLocaleString()} Freshmen Live</span>
           </div>
         </div>
 
